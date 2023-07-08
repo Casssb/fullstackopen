@@ -7,26 +7,26 @@ export interface ContentInterface {
   exercise: number;
 }
 
-const App = () => {
-  const course = 'Half Stack application development';
-  const part1 = 'Fundamentals of React';
-  const exercises1 = 10;
-  const part2 = 'Using props to pass data';
-  const exercises2 = 7;
-  const part3 = 'State of a component';
-  const exercises3 = 14;
+export interface CourseInterface {
+  name: string
+  contentArray: ContentInterface[]
+}
 
-  const contentArray: ContentInterface[] = [
-    { part: part1, exercise: exercises1 },
-    { part: part2, exercise: exercises2 },
-    { part: part3, exercise: exercises3 },
-  ];
+const App = () => {
+  const course = {
+    name: 'Half Stack application development',
+    contentArray: [
+      { part: 'Fundamentals of React', exercise: 10 },
+      { part: "Using props to pass data'", exercise: 7 },
+      { part: 'State of a component', exercise: 14 },
+    ],
+  };
 
   return (
     <div>
       <Header course={course} />
-      <Content contentArray={contentArray}/>
-      <Total total={contentArray.reduce((acc,c) => acc + c.exercise, 0)}/>
+      <Content contentArray={course.contentArray} />
+      <Total total={course.contentArray.reduce((acc, c) => acc + c.exercise, 0)} />
     </div>
   );
 };

@@ -1,9 +1,11 @@
+import { CourseInterface } from "../App";
+
 interface Props {
-    course: string
+    course: CourseInterface
 }
 
 const Header = ({course}: Props) => {
-  return <h1>{course}</h1>;
+  return <h1>{course.name}</h1>;
 };
 
 export default Header;
