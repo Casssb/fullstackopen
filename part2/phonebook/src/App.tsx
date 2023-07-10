@@ -1,58 +1,71 @@
-import { useState } from 'react'
+import { SyntheticEvent, useState } from 'react';
+import PersonForm from './components/PersonForm';
+import PersonDisplay from './components/PersonDisplay';
+import Filter from './components/Filter';
 
-interface Person {
-  name: string
-  number: number | null
+export interface Person {
+  name: string;
+  number: number | null;
 }
 
 const App = () => {
   const [persons, setPersons] = useState<Person[]>([
-    { name: 'Arto Hellas', number: 999923424 }
-  ]) 
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState<number|null>(undefined)
-  const [error, setError] = useState('')
+    { name: 'Arto Hellas', number: 999923424 },
+  ]);
+  const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState<number | null>(null);
+  const [error, setError] = useState('');
+  const [filterText, setFilterText] = useState('');
+  const [filteredPersons, setFilteredPersons] = useState<Person[]>([]);
 
-  const addPerson = (e) => {
-    e.preventDefault()
-    setError('')
-    if(!newName.length) {
-      setError('Please enter a name')
-      return
+  const addPerson = (e: SyntheticEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!newName.length) {
+      setError('Please enter a name');
+      return;
     }
-    if(persons.some(person => person.name === newName)) {
-      setError(`${newName} is already in the phonebook`)
-      alert(`${newName} is already in the phonebook`)
-      return
+    if (!newNumber) {
+      setError('Please enter a number');
+      return;
     }
-    setPersons([...persons, {name: newName, number: newNumber}])
-    setNewName('')
-  }
+    if (persons.some((person) => person.name === newName)) {
+      setError(`${newName} is already in the phonebook`);
+      alert(`${newName} is already in the phonebook`);
+      return;
+    }
+    setPersons([...persons, { name: newName, number: newNumber }]);
+    setNewName('');
+  };
+
+  const filterByName = (e: SyntheticEvent) => {
+    e.preventDefault();
+    const searchName = (e.target as HTMLInputElement).value;
+    setFilterText(searchName);
+    const filteredPeople = persons.filter((person) =>
+      person.name.toLowerCase().includes(searchName.toLowerCase())
+    );
+    setFilteredPersons(filteredPeople);
+  };
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
-        <div>
-          name: <input value={newName} onChange={(e) => setNewName(e.target.value)} required/>
-        </div>
-        <div>
-          number: <input type="number" value={newNumber} onChange={(e) => setNewNumber(Number(e.target.value))} required/>
-        </div>
-        <div>
-          <button type="submit" onClick={(e) => addPerson(e)}>add</button>
-        </div>
-      </form>
-      {persons.map(person => (
-        <div key={person.name}>
-          <h4>{person.name} {person.number}</h4>
-        </div>
-      ))}
-      {error && (
-        <p>{error}</p>
-      )}
+      <Filter filterText={filterText} filterByName={filterByName} />
+      <PersonForm
+        newName={newName}
+        newNumber={newNumber as number}
+        setNewName={setNewName}
+        setNewNumber={setNewNumber}
+        addPerson={addPerson}
+      />
+      <h3>People</h3>
+      {!filteredPersons.length
+        ? persons.map((person) => <PersonDisplay person={person} />)
+        : filteredPersons.map((person) => <PersonDisplay person={person} />)}
+      {error && <p>{error}</p>}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
