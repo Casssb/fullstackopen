@@ -2,7 +2,7 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import PersonForm from './components/PersonForm';
 import PersonDisplay from './components/PersonDisplay';
 import Filter from './components/Filter';
-import axios from 'axios';
+import Services from './components/Services';
 
 export interface Person {
   name: string;
@@ -13,7 +13,7 @@ export interface Person {
 const App = () => {
   const [persons, setPersons] = useState<Person[]>([]);
   const [newName, setNewName] = useState('');
-  const [newNumber, setNewNumber] = useState<number | null>(null);
+  const [newNumber, setNewNumber] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [filterText, setFilterText] = useState('');
   const [filteredPersons, setFilteredPersons] = useState<Person[]>([]);
@@ -34,11 +34,11 @@ const App = () => {
       alert(`${newName} is already in the phonebook`);
       return;
     }
-    setPersons([
-      ...persons,
-      { name: newName, number: newNumber, id: persons.length + 1 },
-    ]);
+    const newPerson = { name: newName, number: Number(newNumber), id: persons.length + 1 }
+    void Services.createPerson(newPerson)
+    setPersons([...persons, newPerson])
     setNewName('');
+    setNewNumber('')
   };
 
   const filterByName = (e: SyntheticEvent) => {
@@ -51,18 +51,9 @@ const App = () => {
     setFilteredPersons(filteredPeople);
   };
 
-  const getPersons = async () : Promise<void> => {
-    try {
-      const personsPromise = await axios.get('http://localhost:3001/persons');
-      const personsJSON =  personsPromise.data as Person[];
-      setPersons(personsJSON)
-    } catch (error) {
-      console.log(error)
-    }
-  };
 
   useEffect(() => {
-    void getPersons();
+    void Services.getPersons(setPersons);
   }, []);
 
   return (
@@ -71,15 +62,15 @@ const App = () => {
       <Filter filterText={filterText} filterByName={filterByName} />
       <PersonForm
         newName={newName}
-        newNumber={newNumber as number}
+        newNumber={newNumber}
         setNewName={setNewName}
         setNewNumber={setNewNumber}
         addPerson={addPerson}
       />
       <h3>People</h3>
       {!filteredPersons.length
-        ? persons.map((person) => <PersonDisplay person={person} />)
-        : filteredPersons.map((person) => <PersonDisplay person={person} />)}
+        ? persons.map((person) => <PersonDisplay key={person.id} person={person} />)
+        : filteredPersons.map((person) => <PersonDisplay key={person.id} person={person} />)}
       {error && <p>{error}</p>}
     </div>
   );

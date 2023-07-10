@@ -2,9 +2,9 @@ import { SyntheticEvent } from 'react';
 
 interface Props {
   newName: string;
-  newNumber: number;
+  newNumber: string | null;
   setNewName(e: string): void;
-  setNewNumber(e: number): void;
+  setNewNumber(e: string): void;
   addPerson(e: SyntheticEvent): void;
 }
 
@@ -29,9 +29,8 @@ const PersonForm = ({
       <div>
         number:{' '}
         <input
-          type="number"
-          value={newNumber}
-          onChange={(e) => setNewNumber(Number(e.target.value))}
+          value={newNumber as string}
+          onChange={(e) => setNewNumber(e.target.value)}
           required
         />
       </div>
