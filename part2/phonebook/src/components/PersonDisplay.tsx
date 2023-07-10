@@ -6,7 +6,7 @@ interface Props {
 
 const PersonDisplay = ({ person }: Props) => {
   return (
-    <div key={person.name}>
+    <div key={person.id}>
       <h5>
         {person.name} {person.number}
       </h5>

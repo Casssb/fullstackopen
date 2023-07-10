@@ -1,17 +1,17 @@
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import PersonForm from './components/PersonForm';
 import PersonDisplay from './components/PersonDisplay';
 import Filter from './components/Filter';
+import axios from 'axios';
 
 export interface Person {
   name: string;
   number: number | null;
+  id: number;
 }
 
 const App = () => {
-  const [persons, setPersons] = useState<Person[]>([
-    { name: 'Arto Hellas', number: 999923424 },
-  ]);
+  const [persons, setPersons] = useState<Person[]>([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState<number | null>(null);
   const [error, setError] = useState('');
@@ -34,7 +34,10 @@ const App = () => {
       alert(`${newName} is already in the phonebook`);
       return;
     }
-    setPersons([...persons, { name: newName, number: newNumber }]);
+    setPersons([
+      ...persons,
+      { name: newName, number: newNumber, id: persons.length + 1 },
+    ]);
     setNewName('');
   };
 
@@ -47,6 +50,20 @@ const App = () => {
     );
     setFilteredPersons(filteredPeople);
   };
+
+  const getPersons = async () : Promise<void> => {
+    try {
+      const personsPromise = await axios.get('http://localhost:3001/persons');
+      const personsJSON =  personsPromise.data as Person[];
+      setPersons(personsJSON)
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  useEffect(() => {
+    void getPersons();
+  }, []);
 
   return (
     <div>
