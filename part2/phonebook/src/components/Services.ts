@@ -23,7 +23,33 @@ const createPerson = async (person: Person) => {
   }
 };
 
+const updatePerson =async (person: Person, newNumber: string) => {
+  const updatedPerson = {
+    ...person,
+    number: newNumber
+  }
+  try {
+    const request = await axios.put(`${url}/${person.id!}`, updatedPerson)
+    const response = request.data as Person
+    console.log(response)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const deletePerson =async (id: number) => {
+  try {
+    const request = await axios.delete(`${url}/${id}`)
+    const response = request.data as Person
+    console.log(response)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export default {
   getPersons,
-  createPerson
+  createPerson,
+  updatePerson,
+  deletePerson
 };

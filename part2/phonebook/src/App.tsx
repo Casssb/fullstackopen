@@ -7,7 +7,7 @@ import Services from './components/Services';
 export interface Person {
   name: string;
   number: number | null;
-  id: number;
+  id?: number;
 }
 
 const App = () => {
@@ -21,24 +21,63 @@ const App = () => {
   const addPerson = (e: SyntheticEvent) => {
     e.preventDefault();
     setError('');
+
+    // If there is nothing in the naem input
     if (!newName.length) {
       setError('Please enter a name');
       return;
     }
+
+    // If there is nothing in the number input
     if (!newNumber) {
       setError('Please enter a number');
       return;
     }
-    if (persons.some((person) => person.name === newName)) {
+
+    // If the inputted name matches a name stored in state
+    if (
+      persons.some(
+        (person) => person.name.toLowerCase() === newName.toLowerCase()
+      )
+    ) {
       setError(`${newName} is already in the phonebook`);
-      alert(`${newName} is already in the phonebook`);
+
+      // Confirm if the user wants to update the number matching the name entered
+      if (
+        confirm(
+          `${newName} is already in the phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const [personToUpdate] = persons.filter(
+          (person) => person.name.toLowerCase() === newName.toLowerCase()
+        );
+
+        // Call the service which updates the number on the server
+        void Services.updatePerson(personToUpdate, newNumber)
+
+        // Use map to create a new array replacing the duplicate number in the object matching the name
+        setPersons(
+          persons.map((person) => {
+            if (person.name.toLowerCase() === newName.toLowerCase()) {
+              return {
+                ...person,
+                number: Number(newNumber),
+              };
+            } else {
+              return person;
+            }
+          })
+        );
+      }
+      setNewName('');
+      setNewNumber('');
       return;
     }
-    const newPerson = { name: newName, number: Number(newNumber), id: persons.length + 1 }
-    void Services.createPerson(newPerson)
-    setPersons([...persons, newPerson])
+    const newPerson = { name: newName, number: Number(newNumber) };
+    void Services.createPerson(newPerson);
+    setPersons([...persons, newPerson]);
     setNewName('');
-    setNewNumber('')
+    setNewNumber('');
   };
 
   const filterByName = (e: SyntheticEvent) => {
@@ -51,6 +90,13 @@ const App = () => {
     setFilteredPersons(filteredPeople);
   };
 
+  const handleDelete = (e: SyntheticEvent, id: number, name: string): void => {
+    e.preventDefault();
+    if (window.confirm(`Delete ${name}?`)) {
+      void Services.deletePerson(id);
+      setPersons(persons.filter((person) => person.id !== id));
+    }
+  };
 
   useEffect(() => {
     void Services.getPersons(setPersons);
@@ -69,8 +115,20 @@ const App = () => {
       />
       <h3>People</h3>
       {!filteredPersons.length
-        ? persons.map((person) => <PersonDisplay key={person.id} person={person} />)
-        : filteredPersons.map((person) => <PersonDisplay key={person.id} person={person} />)}
+        ? persons.map((person) => (
+            <PersonDisplay
+              key={person.id}
+              person={person}
+              handleDelete={handleDelete}
+            />
+          ))
+        : filteredPersons.map((person) => (
+            <PersonDisplay
+              key={person.id}
+              person={person}
+              handleDelete={handleDelete}
+            />
+          ))}
       {error && <p>{error}</p>}
     </div>
   );
