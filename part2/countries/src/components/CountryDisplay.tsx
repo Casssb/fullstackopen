@@ -17,7 +17,7 @@ const CountryDisplay = ({ country }: Props) => {
   const [shouldDisplay, setShouldDisplay] = useState(false);
   const [weather, setWeather] = useState<Weather>()
 
-  const API_KEY = 'c35f19687763a3d6d7b695ca8f7b9027';
+  const API_KEY = import.meta.env.VITE_REACT_APP_API_KEY
 
   const getWeather = async () => {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${country.latlng[0]}&lon=${country.latlng[1]}&appid=${API_KEY}&units=metric`;
