@@ -9,10 +9,12 @@ interface Person {
 const express = require('express');
 const app = express();
 const morgan = require('morgan')
+const cors = require('cors')
 
 let db = require('./db.json');
 
 app.use(express.json());
+app.use(cors())
 
 morgan.token('body', (req: Request, res: Response) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
@@ -89,7 +91,7 @@ const unkownEndpoint = (req: Request, res: Response) => {
 
 app.use(unkownEndpoint)
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on port ${PORT}`)
+})
