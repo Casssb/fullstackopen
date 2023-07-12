@@ -1,4 +1,4 @@
-import { Request, Response, response } from 'express';
+import { Request, Response } from 'express';
 
 interface Person {
   id: number;
@@ -8,10 +8,14 @@ interface Person {
 
 const express = require('express');
 const app = express();
+const morgan = require('morgan')
 
 let db = require('./db.json');
 
 app.use(express.json());
+
+morgan.token('body', (req: Request, res: Response) => JSON.stringify(req.body))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/api/persons', (req: Request, res: Response) => {
   res.json(db);
@@ -78,6 +82,12 @@ app.get('/info', (req: Request, res: Response) => {
                 <p>${currentDate.toLocaleString()}</p>
             </div>`);
 });
+
+const unkownEndpoint = (req: Request, res: Response) => {
+  res.status(404).send({error: 'unkown endpoint'})
+}
+
+app.use(unkownEndpoint)
 
 const PORT = 3001;
 app.listen(PORT, () => {
