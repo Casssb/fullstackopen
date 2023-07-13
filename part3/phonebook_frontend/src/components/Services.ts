@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Person } from '../App';
 
-const url = 'http://localhost:3001/api/persons';
+const url = '/api/persons';
 
 const getPersons = async (setter: (arg0: Person[]) => void): Promise<void> => {
   try {
@@ -21,7 +21,9 @@ const createPerson = async (
   try {
     const request = await axios.post(url, person);
     const response = request.data as Person;
-    setter((prev) => [...prev, response]);
+    // The below code is horrible typescript. I'll need to refactor.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    setter(((prev: any) => [...prev, response] as Person[]) as unknown as Person[]);
     showErrorMessage(true, `${response.name} has been added to the phonebook`);
     console.log(response);
   } catch (error) {
@@ -41,10 +43,16 @@ const updatePerson = async (
   try {
     const request = await axios.put(`${url}/${person.id!}`, updatedPerson);
     const response = request.data as Person;
-    showErrorMessage(true, `${response.name}'s old number has been updated to ${newNumber}`);
+    showErrorMessage(
+      true,
+      `${response.name}'s old number has been updated to ${newNumber}`
+    );
     console.log(response);
   } catch (error) {
-    showErrorMessage(false, `${person.name} has been removed from the server (you may need to refresh your browser)`);
+    showErrorMessage(
+      false,
+      `${person.name} has been removed from the server (you may need to refresh your browser)`
+    );
     console.log(error);
   }
 };
@@ -60,7 +68,10 @@ const deletePerson = async (
     showErrorMessage(true, `${name} has been deleted from the Phonebook`);
     console.log(response);
   } catch (error) {
-    showErrorMessage(false, `${name} has already been deleted from the Phonebook`);
+    showErrorMessage(
+      false,
+      `${name} has already been deleted from the Phonebook`
+    );
     console.log(error);
   }
 };

@@ -15,6 +15,7 @@ let db = require('./db.json');
 
 app.use(express.json());
 app.use(cors())
+app.use(express.static('./src/dist'))
 
 morgan.token('body', (req: Request, res: Response) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
