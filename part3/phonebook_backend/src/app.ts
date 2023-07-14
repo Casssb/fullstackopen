@@ -5,13 +5,14 @@ interface Person {
   name: string;
   number: string;
 }
-
+require('dotenv').config()
 const express = require('express');
 const app = express();
 const morgan = require('morgan')
 const cors = require('cors')
 
 let db = require('./db.json');
+const Person = require('./models/person')
 
 app.use(express.json());
 app.use(cors())
@@ -92,7 +93,7 @@ const unkownEndpoint = (req: Request, res: Response) => {
 
 app.use(unkownEndpoint)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
