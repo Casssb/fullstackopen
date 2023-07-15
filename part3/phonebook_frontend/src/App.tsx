@@ -7,8 +7,8 @@ import Message from './components/Message';
 
 export interface Person {
   name: string;
-  number: number | null;
-  id?: number;
+  number: string | null;
+  id?: string;
 }
 
 const App = () => {
@@ -70,7 +70,7 @@ const App = () => {
             if (person.name.toLowerCase() === newName.toLowerCase()) {
               return {
                 ...person,
-                number: Number(newNumber),
+                number: newNumber,
               };
             } else {
               return person;
@@ -82,7 +82,7 @@ const App = () => {
       setNewNumber('');
       return;
     }
-    const newPerson = { name: newName, number: Number(newNumber) };
+    const newPerson = { name: newName, number: newNumber };
     void Services.createPerson(newPerson, setPersons, showErrorMessage);
     setNewName('');
     setNewNumber('');
@@ -98,7 +98,7 @@ const App = () => {
     setFilteredPersons(filteredPeople);
   };
 
-  const handleDelete = (e: SyntheticEvent, id: number, name: string): void => {
+  const handleDelete = (e: SyntheticEvent, id: string, name: string): void => {
     e.preventDefault();
     if (window.confirm(`Delete ${name}?`)) {
       void Services.deletePerson(id, name, showErrorMessage);

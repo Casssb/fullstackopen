@@ -3,7 +3,7 @@ import { Person } from '../App';
 
 interface Props {
   person: Person;
-  handleDelete(e: SyntheticEvent,id: number, name: string): void
+  handleDelete(e: SyntheticEvent,id: string, name: string): void
 }
 
 const PersonDisplay = ({ person, handleDelete }: Props) => {
@@ -12,7 +12,7 @@ const PersonDisplay = ({ person, handleDelete }: Props) => {
       <h5>
         {person.name} {person.number}
       </h5>
-      <button onClick={(e) => handleDelete(e, Number(person.id), person.name)}>Delete</button>
+      <button onClick={(e) => handleDelete(e, person.id!, person.name)}>Delete</button>
     </div>
   );
 };

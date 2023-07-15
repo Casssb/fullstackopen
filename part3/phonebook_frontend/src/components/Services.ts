@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import axios from 'axios';
 import { Person } from '../App';
 
@@ -23,11 +24,17 @@ const createPerson = async (
     const response = request.data as Person;
     // The below code is horrible typescript. I'll need to refactor.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    setter(((prev: any) => [...prev, response] as Person[]) as unknown as Person[]);
+    setter(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      ((prev: any) => [...prev, response] as Person[]) as unknown as Person[]
+    );
     showErrorMessage(true, `${response.name} has been added to the phonebook`);
     console.log(response);
   } catch (error) {
-    console.log(error);
+    if (axios.isAxiosError(error)) {
+      console.log(error)
+      showErrorMessage(false, error.response!.data.error as string)
+    }
   }
 };
 
@@ -58,7 +65,7 @@ const updatePerson = async (
 };
 
 const deletePerson = async (
-  id: number,
+  id: string,
   name: string,
   showErrorMessage: (isSuccess: boolean, message: string) => void
 ) => {
