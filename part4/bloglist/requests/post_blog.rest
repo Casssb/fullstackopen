@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs
+content-type: application/json
+
+{
+    "title": "bob ross is awesome",
+    "author": "bob ross",
+    "url": "thejoyofpainting.com",
+    "likes": "69"
+}
