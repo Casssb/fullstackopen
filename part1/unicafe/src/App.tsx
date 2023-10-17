@@ -7,7 +7,7 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
-  const handleClick = (feedback: string): void => {
+  const handleClick = (feedback: String): void => {
       switch(feedback) {
         case 'good':
           setGood(prev => prev + 1)
