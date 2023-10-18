@@ -5,5 +5,19 @@ content-type: application/json
     "title": "bob ross is awesome",
     "author": "bob ross",
     "url": "thejoyofpainting.com",
-    "likes": "69"
+    "likes": "69",
+    "userId": "652fe65da8a2214176568f1f"
+}
+
+###
+
+POST http://localhost:3001/api/blogs
+content-type: application/json
+
+{
+    "title": "oreos are overrated",
+    "author": "bob ross",
+    "url": "thejoyofpainting.com",
+    "likes": "2",
+    "userId": "652fe65da8a2214176568f1f"
 }

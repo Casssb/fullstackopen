@@ -70,7 +70,6 @@ describe('PUT blogs', () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
     const update = { likes: 400 };
-
     expect(blogToUpdate.likes).toEqual(22);
 
     await api
@@ -83,6 +82,32 @@ describe('PUT blogs', () => {
     const response = await api.get('/api/blogs');
 
     expect(response.body[0].likes).toEqual(400);
+  });
+  test('only likes should be updatable', async () => {
+    const blogsAtStart = await helper.blogsInDb();
+    const blogToUpdate = blogsAtStart[0];
+    const update = {
+      title: "you can't change this",
+      author: 'or this',
+      url: 'orthis.com',
+      likes: 400,
+    };
+
+    expect(Number(blogToUpdate.likes)).toBe(22);
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+
+      .send(update)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const response = await api.get('/api/blogs');
+
+    expect(response.body[0].likes).toEqual(400);
+    expect(response.body[0].title).toEqual('hola');
+    expect(response.body[0].author).toEqual('beto rossa');
+    expect(response.body[0].url).toEqual('thejoyofpainting.esp');
   });
 });
 
