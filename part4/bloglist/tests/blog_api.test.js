@@ -117,7 +117,7 @@ describe('POST blogs', () => {
       title: 'hallo',
       author: 'reich rossteiger',
       url: 'thejoyofpainting.de',
-      likes: '22',
+      likes: 22,
     };
 
     await api
@@ -148,7 +148,7 @@ describe('POST blogs', () => {
     const newBlog = {
       title: 'one of a kind',
       author: 'rob van damme',
-      likes: '22',
+      likes: 22,
     };
 
     await api.post('/api/blogs').send(newBlog).expect(400);

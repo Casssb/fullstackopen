@@ -22,17 +22,17 @@ blogsRouter.get('/:id', async (request, response, next) => {
 
 blogsRouter.post('/', async (request, response, next) => {
   const body = request.body;
-  const user = await User.findById(body.userId);
+  // const user = await User.findById(body.userId);
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
-    user: user.id,
+    // user: user.id,
   });
   try {
     const savedBlog = await blog.save();
-    user.blogs = user.blogs.concat(savedBlog._id)
-    await user.save()
+    // user.blogs = user.blogs.concat(savedBlog._id)
+    // await user.save()
     response.status(201).json(savedBlog);
   } catch (error) {
     next(error);
