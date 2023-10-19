@@ -68,9 +68,10 @@ describe(' GET blogs', () => {
 describe('PUT blogs', () => {
   test('number of likes can be updated on a speciifc blog', async () => {
     const blogsAtStart = await helper.blogsInDb();
-    const blogToUpdate = blogsAtStart[0];
+    const blogToUpdate = blogsAtStart.find(blog => blog.title === "hola");
+    console.log(blogToUpdate)
     const update = { likes: 400 };
-    expect(blogToUpdate.likes).toEqual(22);
+    expect(Number(blogToUpdate.likes)).toEqual(22);
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
@@ -81,11 +82,11 @@ describe('PUT blogs', () => {
 
     const response = await api.get('/api/blogs');
 
-    expect(response.body[0].likes).toEqual(400);
+    expect(response.body.find(blog => blog.title === 'hola').likes).toEqual(400);
   });
   test('only likes should be updatable', async () => {
     const blogsAtStart = await helper.blogsInDb();
-    const blogToUpdate = blogsAtStart[0];
+    const blogToUpdate = blogsAtStart.find(blog => blog.title === "hola");
     const update = {
       title: "you can't change this",
       author: 'or this',
@@ -93,7 +94,7 @@ describe('PUT blogs', () => {
       likes: 400,
     };
 
-    expect(Number(blogToUpdate.likes)).toBe(22);
+    expect(Number(blogToUpdate.likes)).toEqual(22);
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
@@ -104,10 +105,12 @@ describe('PUT blogs', () => {
 
     const response = await api.get('/api/blogs');
 
-    expect(response.body[0].likes).toEqual(400);
-    expect(response.body[0].title).toEqual('hola');
-    expect(response.body[0].author).toEqual('beto rossa');
-    expect(response.body[0].url).toEqual('thejoyofpainting.esp');
+    const blogToCheck = response.body.find(blog => blog.title === 'hola')
+
+    expect(blogToCheck.likes).toEqual(400);
+    expect(blogToCheck.title).toEqual('hola');
+    expect(blogToCheck.author).toEqual('beto rossa');
+    expect(blogToCheck.url).toEqual('thejoyofpainting.esp');
   });
 });
 
