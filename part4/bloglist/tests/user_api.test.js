@@ -7,15 +7,9 @@ const helper = require('./test_helper');
 
 const api = supertest(app);
 
-const plaintextPassword = 'nottellingyou';
-
 beforeEach(async () => {
   await User.deleteMany({});
-
-  const passwordHash = await bcrypt.hash(plaintextPassword, 10);
-  const user = new User({ username: 'root', passwordHash });
-
-  await user.save();
+  await helper.generateInitialUser();
 });
 
 describe('POST user', () => {

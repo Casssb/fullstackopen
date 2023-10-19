@@ -3,8 +3,14 @@ const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
 const helper = require('./test_helper');
+const User = require('../models/user');
 
 const api = supertest(app);
+
+beforeEach(async () => {
+  await User.deleteMany({});
+  await helper.generateInitialUser();
+});
 
 beforeEach(async () => {
   await Blog.deleteMany({});
@@ -66,10 +72,13 @@ describe(' GET blogs', () => {
 });
 
 describe('PUT blogs', () => {
+  afterEach(async () => {
+    await User.deleteMany({});
+    await Blog.deleteMany({});
+  });
   test('number of likes can be updated on a speciifc blog', async () => {
     const blogsAtStart = await helper.blogsInDb();
-    const blogToUpdate = blogsAtStart.find(blog => blog.title === "hola");
-    console.log(blogToUpdate)
+    const blogToUpdate = blogsAtStart.find((blog) => blog.title === 'hola');
     const update = { likes: 400 };
     expect(Number(blogToUpdate.likes)).toEqual(22);
 
@@ -82,11 +91,13 @@ describe('PUT blogs', () => {
 
     const response = await api.get('/api/blogs');
 
-    expect(response.body.find(blog => blog.title === 'hola').likes).toEqual(400);
+    expect(response.body.find((blog) => blog.title === 'hola').likes).toEqual(
+      400
+    );
   });
   test('only likes should be updatable', async () => {
     const blogsAtStart = await helper.blogsInDb();
-    const blogToUpdate = blogsAtStart.find(blog => blog.title === "hola");
+    const blogToUpdate = blogsAtStart.find((blog) => blog.title === 'hola');
     const update = {
       title: "you can't change this",
       author: 'or this',
@@ -105,7 +116,7 @@ describe('PUT blogs', () => {
 
     const response = await api.get('/api/blogs');
 
-    const blogToCheck = response.body.find(blog => blog.title === 'hola')
+    const blogToCheck = response.body.find((blog) => blog.title === 'hola');
 
     expect(blogToCheck.likes).toEqual(400);
     expect(blogToCheck.title).toEqual('hola');
@@ -116,6 +127,7 @@ describe('PUT blogs', () => {
 
 describe('POST blogs', () => {
   test('a valid blog can be added', async () => {
+    const loggedInUser = await api.post('/api/login').send(helper.initialUser);
     const newBlog = {
       title: 'hallo',
       author: 'reich rossteiger',
@@ -126,6 +138,7 @@ describe('POST blogs', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
@@ -138,9 +151,14 @@ describe('POST blogs', () => {
   });
 
   test('blog without a title is not added', async () => {
+    const loggedInUser = await api.post('/api/login').send(helper.initialUser);
     const newBlog = { author: 'rob van damme', url: 'rvd.com', likes: '22' };
 
-    await api.post('/api/blogs').send(newBlog).expect(400);
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
+      .expect(400);
 
     const response = await api.get('/api/blogs');
 
@@ -148,13 +166,18 @@ describe('POST blogs', () => {
   });
 
   test('blog without a url is not added', async () => {
+    const loggedInUser = await api.post('/api/login').send(helper.initialUser);
     const newBlog = {
       title: 'one of a kind',
       author: 'rob van damme',
       likes: 22,
     };
 
-    await api.post('/api/blogs').send(newBlog).expect(400);
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
+      .expect(400);
 
     const response = await api.get('/api/blogs');
 
@@ -162,6 +185,7 @@ describe('POST blogs', () => {
   });
 
   test('blog without likes key is added but the value defaults to 0', async () => {
+    const loggedInUser = await api.post('/api/login').send(helper.initialUser);
     const newBlog = {
       title: 'one of a kind',
       author: 'rob van damme',
@@ -171,6 +195,7 @@ describe('POST blogs', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/);
 
@@ -183,18 +208,59 @@ describe('POST blogs', () => {
 
 describe('DELETE blogs', () => {
   test('a blog can be deleted if the id is valid (returns 204)', async () => {
-    const blogsAtStart = await helper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
+    const loggedInUser = await api.post('/api/login').send(helper.initialUser);
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const newBlog = {
+      title: 'hallo',
+      author: 'reich rossteiger',
+      url: 'thejoyofpainting.de',
+      likes: 22,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsBeforeDelete = await helper.blogsInDb();
+    const blogToDelete = blogsBeforeDelete.find(
+      (blog) => blog.title === 'hallo'
+    );
+
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${loggedInUser.body.token}`)
+      .expect(204);
 
     const blogsAtEnd = await helper.blogsInDb();
 
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+    expect(blogsAtEnd).toHaveLength(blogsBeforeDelete.length - 1);
 
     const titles = blogsAtEnd.map((resp) => resp.title);
 
     expect(titles).not.toContain(blogToDelete.title);
+  });
+
+  test('a blog cannot be deleted if the user has not logged in (returns 401)', async () => {
+    const blogsBeforeDelete = await helper.blogsInDb();
+    const blogToDelete = blogsBeforeDelete.find(
+      (blog) => blog.title === 'hola'
+    );
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(401);
+
+    const blogsAtEnd = await helper.blogsInDb();
+
+    expect(blogsAtEnd).toHaveLength(blogsBeforeDelete.length);
+
+    const titles = blogsAtEnd.map((resp) => resp.title);
+
+    expect(titles).toContain(blogToDelete.title);
   });
 });
 

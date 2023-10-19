@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const getTokenFrom = require('./tokenExtractor');
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method);
@@ -28,8 +29,14 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+const tokenExtractor = (request, response, next) => {
+  request.token = getTokenFrom(request);
+  next();
+};
+
 module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
+  tokenExtractor
 };
