@@ -1,7 +1,8 @@
 import { SyntheticEvent, useState } from 'react';
-import { login } from '../services/login';
 import { iUser } from '../services/login';
+import { login } from '../services/login';
 import { AxiosError } from 'axios';
+import { setToken } from '../services/blogs';
 
 interface LoginFormProps {
   setUser(user: iUser): void;
@@ -15,16 +16,20 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
   const handleLogin = async (event: SyntheticEvent) => {
     event.preventDefault();
     try {
-      const user = await login({username, password});
+      const user = await login({ username, password });
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      ) 
+      setToken(user.token);
       setUser(user);
       setUsername('');
       setPassword('');
     } catch (error) {
       if (error instanceof AxiosError) {
-        setError(error.message)
+        setError(`${error.response?.status}: incorrect username or password`);
         setTimeout(() => {
-          setError('')
-        }, 5000)
+          setError('');
+        }, 5000);
       }
     }
   };
@@ -62,7 +67,7 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
           login
         </button>
       </form>
-      <p>{error}</p>
+      <p className='text-red-700 p-2'>{error}</p>
     </div>
   );
 };
