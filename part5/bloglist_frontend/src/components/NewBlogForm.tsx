@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
-import { createBlog, iBlog } from '../services/blogs';
+import { createBlog, getSingleBlog, iBlog } from '../services/blogs';
 import { AxiosError } from 'axios';
+import { setMessageAfterDelay } from '../utils/helper';
 
 interface NewBlogFormProps {
   setBlogs: Dispatch<SetStateAction<iBlog[]>>
@@ -22,15 +23,16 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
     };
     try {
       const successfullBlog = await createBlog(newBlog) as iBlog;
-      const successString = `New blog added: ${successfullBlog.title} byt ${successfullBlog.author}`;
-      setBlogs(prevBlogs => [...prevBlogs, successfullBlog]);
+      const blogWithUserDetails = await getSingleBlog(successfullBlog.id as string)
+      console.log(successfullBlog)
+      const successString = `New blog added: ${successfullBlog.title} by ${successfullBlog.author}`;
+      setBlogs(prevBlogs => [...prevBlogs, blogWithUserDetails]);
       setSuccess(successString);
+      setMessageAfterDelay(setSuccess,'', 5000)
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.message);
-        setTimeout(() => {
-          setError('');
-        }, 5000);
+        setMessageAfterDelay(setError,'', 5000)
       }
     }
     console.log(success);
@@ -81,7 +83,8 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
           Create blog
         </button>
       </form>
-      <p>{error}</p>
+      <p className='text-green-400'>{success}</p>
+      <p className='text-red-400'>{error}</p>
     </div>
   );
 };

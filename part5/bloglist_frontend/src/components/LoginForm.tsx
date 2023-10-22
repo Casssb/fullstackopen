@@ -3,6 +3,7 @@ import { iUser } from '../services/login';
 import { login } from '../services/login';
 import { AxiosError } from 'axios';
 import { setToken } from '../services/blogs';
+import { setMessageAfterDelay } from '../utils/helper';
 
 interface LoginFormProps {
   setUser(user: iUser): void;
@@ -17,9 +18,7 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
     event.preventDefault();
     try {
       const user = await login({ username, password });
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
       setToken(user.token);
       setUser(user);
       setUsername('');
@@ -27,9 +26,7 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(`${error.response?.status}: incorrect username or password`);
-        setTimeout(() => {
-          setError('');
-        }, 5000);
+        setMessageAfterDelay(setError, '', 5000);
       }
     }
   };
@@ -67,7 +64,7 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
           login
         </button>
       </form>
-      <p className='text-red-700 p-2'>{error}</p>
+      <p className="text-red-700 p-2">{error}</p>
     </div>
   );
 };
