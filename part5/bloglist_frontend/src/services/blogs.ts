@@ -27,6 +27,12 @@ const setToken = (newToken: string) => {
   token = `Bearer ${newToken}`;
 };
 
+const createConfig = (jwtTokwn: string) => {
+  return {
+    headers: { Authorization: jwtTokwn },
+  };
+};
+
 const getAllBlogs = async () => {
   const response = await axios.get(baseUrl);
   return response.data;

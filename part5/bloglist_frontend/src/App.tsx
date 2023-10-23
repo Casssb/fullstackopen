@@ -12,6 +12,7 @@ function App() {
   const [blogs, setBlogs] = useState<iBlog[]>([]);
   const [user, setUser] = useState<iUser | null>(null);
 
+  console.log(blogs)
   useEffect(() => {
     getAllBlogs().then((blogs: iBlog[]) =>
       setBlogs(blogs.sort((a, b) => b.likes! - a.likes!))

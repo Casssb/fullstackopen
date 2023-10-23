@@ -26,6 +26,7 @@ const Blog = ({ blog, user, setBlogs }: BlogProps) => {
         likes: blogToUpdate.likes + 1,
       };
       const updatedBlog = await updateBlogLikes(blog.id!, newLikes);
+      console.log(updatedBlog)
       setBlogs((prevState) =>
         prevState.map((blog) =>
           blog.id === updatedBlog.id ? updatedBlog : blog

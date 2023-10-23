@@ -50,7 +50,7 @@ blogsRouter.put('/:id', async (request, response, next) => {
       request.params.id,
       { likes: request.body.likes },
       { new: true }
-    );
+    ).populate('user');
     response.status(201).json(updatedBlog);
   } catch (error) {
     next(error);
