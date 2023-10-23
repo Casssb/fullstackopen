@@ -44,25 +44,19 @@ const getSingleBlog = async (id: string) => {
 };
 
 const createBlog = async (newBlog: iBlog): Promise<iBlog> => {
-  const config = {
-    headers: { Authorization: token },
-  };
+  const config = createConfig(token);
 
   const response = await axios.post(baseUrl, newBlog, config);
   return response.data;
 };
 
 const deleteBlog = async (id: string) => {
-  const config = {
-    headers: { Authorization: token },
-  };
+  const config = createConfig(token);
   await axios.delete(`${baseUrl}/${id}`, config);
 };
 
 const updateBlogLikes = (id: string, updatedBlogLikes: iBlogLikes) => {
-  const config = {
-    headers: { Authorization: token },
-  };
+  const config = createConfig(token);
   const request = axios.put(`${baseUrl}/${id}`, updatedBlogLikes, config);
   return request.then((response) => response.data);
 };
