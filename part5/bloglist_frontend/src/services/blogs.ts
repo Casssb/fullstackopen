@@ -27,9 +27,9 @@ const setToken = (newToken: string) => {
   token = `Bearer ${newToken}`;
 };
 
-const createConfig = (jwtTokwn: string) => {
+const createConfig = (jwtToken: string) => {
   return {
-    headers: { Authorization: jwtTokwn },
+    headers: { Authorization: jwtToken },
   };
 };
 

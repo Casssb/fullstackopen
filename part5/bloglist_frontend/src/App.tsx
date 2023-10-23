@@ -29,7 +29,7 @@ function App() {
   }, []);
 
   return (
-    <main className="bg-slate-200 h-full flex flex-col gap-1 justify-center items-center">
+    <main className="bg-slate-200 h-full min-h-screen flex flex-col gap-1 justify-center items-center">
       <h1 className="font-mono text-2xl p-2 font-bold">Blogs R Us</h1>
       {user ? (
         <section className="flex flex-col items-center justify-center gap-1">
@@ -50,5 +50,4 @@ function App() {
     </main>
   );
 }
-
 export default App;
