@@ -50,6 +50,7 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
             type="text"
             value={title}
             name="title"
+            id='title'
             required
             onChange={({ target }) => setTitle(target.value)}
           />
@@ -59,6 +60,7 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
           <input
             className="pl-1"
             type="author"
+            id='author'
             value={author}
             name="author"
             required
@@ -66,10 +68,11 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
           />
         </div>
         <div className="flex gap-2 justify-center items-center">
-          <label htmlFor="title">url</label>
+          <label htmlFor="url">url</label>
           <input
             className="pl-1"
             type="text"
+            id='url'
             value={url}
             name="url"
             required
