@@ -62,6 +62,7 @@ const Blog = ({ blog, user, setBlogs }: BlogProps) => {
         <button
           onClick={() => setShowContent(!showContent)}
           type="button"
+          data-test-id="show-button"
           className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           {showContent ? 'hide' : 'show'}
@@ -70,8 +71,8 @@ const Blog = ({ blog, user, setBlogs }: BlogProps) => {
       {showContent && (
         <>
           <h4 className="italic">{blog.author}</h4>
-          <div className="flex justify-center items-center gap-2">
-            <p className="font-medium">Likes: {blog.likes}</p>
+          <div className="flex justify-center items-center gap-2" id='likes-container'>
+            <p className="font-medium" data-test-id='likes-display'>Likes: {blog.likes}</p>
             <button
               onClick={() => handleUpdateLikes()}
               type="button"
