@@ -7,7 +7,7 @@ const AnecdoteForm = () => {
   const [error, setError] = useState('');
   const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!anecdote.trim()) {
       setError('please enter an anecdote');
@@ -16,8 +16,8 @@ const AnecdoteForm = () => {
       }, 2000);
       return;
     }
-    setAnecdote('');
     dispatch(createAnecdote(anecdote));
+    setAnecdote('');
   };
 
   return (
