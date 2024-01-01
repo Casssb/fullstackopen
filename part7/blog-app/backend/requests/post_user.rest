@@ -1,0 +1,54 @@
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "suckitgrunty",
+    "name": "banjo",
+    "password": "kazooie"
+}
+
+###
+//no username
+
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "name": "nousername",
+    "password": "kazooie"
+}
+
+###
+//no password
+
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "justright",
+    "name": "nopassword"
+}
+
+###
+//username too short
+
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "t",
+    "name": "tooshort",
+    "password": "kazooie"
+}
+
+###
+//password too short
+
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "justright",
+    "name": "tooshort",
+    "password": "ka"
+}
