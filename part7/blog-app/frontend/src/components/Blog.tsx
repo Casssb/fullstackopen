@@ -1,59 +1,68 @@
-import { Dispatch, SetStateAction, useState } from 'react';
-import {
-  deleteBlog,
-  getSingleBlog,
-  iBlog,
-  updateBlogLikes,
-} from '../services/blogs';
+import { useState } from 'react';
+import { deleteBlog, iBlog, updateBlogLikes } from '../services/blogs';
 import { iUser } from '../services/login';
-import { AxiosError } from 'axios';
 import { setMessageAfterDelay } from '../utils/helper';
 import { useNotificationDispatch } from '../NotificationContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface BlogProps {
   blog: iBlog;
   user: iUser;
-  setBlogs: Dispatch<SetStateAction<iBlog[]>>;
 }
 
-const Blog = ({ blog, user, setBlogs }: BlogProps) => {
+const Blog = ({ blog, user }: BlogProps) => {
   const [showContent, setShowContent] = useState(false);
   const dispatch = useNotificationDispatch();
+  const queryClient = useQueryClient();
 
-  const handleUpdateLikes = async () => {
-    try {
-      const blogToUpdate = await getSingleBlog(blog.id!);
-      const newLikes = {
-        likes: blogToUpdate.likes + 1,
-      };
-      const updatedBlog = await updateBlogLikes(blog.id!, newLikes);
-      console.log(updatedBlog)
-      setBlogs((prevState) =>
-        prevState.map((blog) =>
-          blog.id === updatedBlog.id ? updatedBlog : blog
-        )
+  const updateLikesMutattion = useMutation({
+    mutationFn: updateBlogLikes,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(['blogs']) as iBlog[];
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog)),
       );
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        dispatch && dispatch({type: 'SET_ERROR', payload: error.message});
-        setMessageAfterDelay(dispatch!,'RESET', 5000);
-      }
+    },
+  });
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: deleteBlog,
+    onSuccess: () => {
+      const blogs = queryClient.getQueryData(['blogs']) as iBlog[];
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.filter((oldBlog) => oldBlog.id !== blog.id),
+      );
+    },
+  });
+
+  const handleUpdateLikes = () => {
+    const newLikes = {
+      likes: blog!.likes! + 1,
+    };
+    updateLikesMutattion.mutate({ id: blog!.id!, updatedBlogLikes: newLikes });
+    if (updateLikesMutattion.isError) {
+      dispatch &&
+        dispatch({
+          type: 'SET_ERROR',
+          payload: updateLikesMutattion.error.message,
+        });
+      setMessageAfterDelay(dispatch!, 'RESET', 5000);
     }
   };
 
-  const handleDeleteBlog = async () => {
-    try {
-      if (window.confirm(`Are you sure you want to delete ${blog.title}?`)) {
-        await deleteBlog(blog.id!);
-        setBlogs((prevState) =>
-          prevState.filter((oldBlog) => oldBlog.id !== blog.id)
-        );
-      }
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        dispatch && dispatch({type: 'SET_ERROR', payload: error.message});
-        setMessageAfterDelay(dispatch!,'RESET', 5000);
-      }
+  const handleDeleteBlog = () => {
+    if (window.confirm(`Are you sure you want to delete ${blog.title}?`)) {
+      deleteBlogMutation.mutate(blog.id!);
+    }
+    if (deleteBlogMutation.isError) {
+      dispatch &&
+        dispatch({
+          type: 'SET_ERROR',
+          payload: deleteBlogMutation.error.message,
+        });
+      setMessageAfterDelay(dispatch!, 'RESET', 5000);
     }
   };
   return (
@@ -72,13 +81,18 @@ const Blog = ({ blog, user, setBlogs }: BlogProps) => {
       {showContent && (
         <>
           <h4 className="italic">{blog.author}</h4>
-          <div className="flex justify-center items-center gap-2" id='likes-container'>
-            <p className="font-medium" data-test-id='likes-display'>Likes: {blog.likes}</p>
+          <div
+            className="flex justify-center items-center gap-2"
+            id="likes-container"
+          >
+            <p className="font-medium" data-test-id="likes-display">
+              Likes: {blog.likes}
+            </p>
             <button
               onClick={() => handleUpdateLikes()}
               type="button"
               data-testid="likes-button"
-              id='likes-button'
+              id="likes-button"
               className="text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm p-2.5 text-center inline-flex items-center dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:focus:ring-blue-800 dark:hover:bg-blue-500"
             >
               <svg

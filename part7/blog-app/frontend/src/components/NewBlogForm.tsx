@@ -1,39 +1,38 @@
-import { Dispatch, SetStateAction, SyntheticEvent, useState } from 'react';
-import { createBlog, getSingleBlog, iBlog } from '../services/blogs';
-import { AxiosError } from 'axios';
+import { SyntheticEvent, useState } from 'react';
+import { createBlog } from '../services/blogs';
 import { setMessageAfterDelay } from '../utils/helper';
 import { useNotificationDispatch } from '../NotificationContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface NewBlogFormProps {
-  setBlogs: Dispatch<SetStateAction<iBlog[]>>
-}
-
-const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
+const NewBlogForm = () => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
   const dispatch = useNotificationDispatch();
+  const queryClient = useQueryClient();
 
-  const handleCreateBlog = async (e: SyntheticEvent) => {
+  const newBlogMutation = useMutation({
+    mutationFn: createBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    },
+  });
+
+  const handleCreateBlog = (e: SyntheticEvent) => {
     e.preventDefault();
     const newBlog = {
       title: title,
       author: author,
       url: url,
     };
-    try {
-      const successfullBlog = await createBlog(newBlog) as iBlog;
-      const blogWithUserDetails = await getSingleBlog(successfullBlog.id as string)
-      console.log(successfullBlog)
-      const successString = `New blog added: ${successfullBlog.title} by ${successfullBlog.author}`;
-      setBlogs(prevBlogs => [...prevBlogs, blogWithUserDetails]);
-      dispatch && dispatch({type: 'SET_SUCCESS', payload: successString})
-      setMessageAfterDelay(dispatch!,'RESET', 5000)
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        dispatch && dispatch({type: 'SET_ERROR', payload: error.message});
-        setMessageAfterDelay(dispatch!,'RESET', 5000);
-      }
+    newBlogMutation.mutate(newBlog);
+    const successString = `New blog added: ${newBlog.title} by ${newBlog.author}`;
+    dispatch && dispatch({ type: 'SET_SUCCESS', payload: successString });
+    setMessageAfterDelay(dispatch!, 'RESET', 5000);
+    if (newBlogMutation.isError) {
+      dispatch &&
+        dispatch({ type: 'SET_ERROR', payload: newBlogMutation.error.message });
+      setMessageAfterDelay(dispatch!, 'RESET', 5000);
     }
   };
   return (
@@ -49,7 +48,7 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
             type="text"
             value={title}
             name="title"
-            id='title'
+            id="title"
             required
             onChange={({ target }) => setTitle(target.value)}
           />
@@ -59,7 +58,7 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
           <input
             className="pl-1"
             type="author"
-            id='author'
+            id="author"
             value={author}
             name="author"
             required
@@ -71,7 +70,7 @@ const NewBlogForm = ({ setBlogs }: NewBlogFormProps) => {
           <input
             className="pl-1"
             type="text"
-            id='url'
+            id="url"
             value={url}
             name="url"
             required

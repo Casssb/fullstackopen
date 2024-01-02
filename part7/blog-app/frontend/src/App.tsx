@@ -8,17 +8,19 @@ import LogOut from './components/LogOut';
 import NewBlogForm from './components/NewBlogForm';
 import Togglable from './components/Togglable';
 import Notification from './components/Notification';
+import { useQuery } from '@tanstack/react-query';
 
 function App() {
-  const [blogs, setBlogs] = useState<iBlog[]>([]);
   const [user, setUser] = useState<iUser | null>(null);
 
-  console.log(blogs)
-  useEffect(() => {
-    getAllBlogs().then((blogs: iBlog[]) =>
-      setBlogs(blogs.sort((a, b) => b.likes! - a.likes!))
-    );
-  }, []);
+  const blogQuery = useQuery({
+    queryKey: ['blogs'],
+    queryFn: getAllBlogs,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
+  // console.log(JSON.parse(JSON.stringify(blogQuery)));
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
@@ -29,22 +31,32 @@ function App() {
     }
   }, []);
 
+  if (blogQuery.isLoading) {
+    return <div>loading data...</div>;
+  }
+
+  if (blogQuery.isError) {
+    return <div>blog off</div>;
+  }
+
   return (
     <main className="bg-slate-200 h-full min-h-screen flex flex-col gap-1 justify-center items-center">
       <h1 className="font-mono text-2xl p-2 font-bold">Blogs R Us</h1>
-      <Notification/>
+      <Notification />
       {user ? (
         <section className="flex flex-col items-center justify-center gap-1">
           <h3 className="p-1 font-semibold text-green-800">
             {user.name} logged in
           </h3>
           <Togglable action="new blog">
-            <NewBlogForm setBlogs={setBlogs} />
+            <NewBlogForm />
           </Togglable>
           <LogOut setUser={setUser} />
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} user={user} setBlogs={setBlogs} />
-          ))}
+          {blogQuery?.data
+            .sort((a: iBlog, b: iBlog) => b.likes! - a.likes!)
+            .map((blog: iBlog) => (
+              <Blog key={blog.id} blog={blog} user={user} />
+            ))}
         </section>
       ) : (
         <LoginForm setUser={setUser} />

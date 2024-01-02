@@ -11,6 +11,11 @@ interface iBlogLikes {
   likes: number;
 }
 
+interface updateLikesProps {
+  id: string;
+  updatedBlogLikes: iBlogLikes;
+}
+
 export interface iBlog {
   title: string;
   author: string;
@@ -55,10 +60,14 @@ const deleteBlog = async (id: string) => {
   await axios.delete(`${baseUrl}/${id}`, config);
 };
 
-const updateBlogLikes = (id: string, updatedBlogLikes: iBlogLikes) => {
+const updateBlogLikes = async (props: updateLikesProps) => {
   const config = createConfig(token);
-  const request = axios.put(`${baseUrl}/${id}`, updatedBlogLikes, config);
-  return request.then((response) => response.data);
+  const response = await axios.put(
+    `${baseUrl}/${props.id}`,
+    props.updatedBlogLikes,
+    config,
+  );
+  return response.data;
 };
 
 export {
