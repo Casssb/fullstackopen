@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { getAllBlogs, setToken } from './services/blogs';
-import { iBlog } from './services/blogs';
-import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
-import LogOut from './components/LogOut';
-import NewBlogForm from './components/NewBlogForm';
-import Togglable from './components/Togglable';
 import Notification from './components/Notification';
 import { useQuery } from '@tanstack/react-query';
 import { useUserDispatch, useUserValue } from './UserContext';
+import BlogList from './components/BlogList';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Navigation from './components/Navigation';
+import UserList from './components/UserList';
+import User from './components/User';
 
 function App() {
   const dispatch = useUserDispatch();
@@ -44,24 +44,25 @@ function App() {
     <main className="bg-slate-200 h-full min-h-screen flex flex-col gap-1 justify-center items-center">
       <h1 className="font-mono text-2xl p-2 font-bold">Blogs R Us</h1>
       <Notification />
-      {user ? (
-        <section className="flex flex-col items-center justify-center gap-1">
-          <h3 className="p-1 font-semibold text-green-800">
-            {user.name} logged in
-          </h3>
-          <Togglable action="new blog">
-            <NewBlogForm />
-          </Togglable>
-          <LogOut />
-          {blogQuery?.data
-            .sort((a: iBlog, b: iBlog) => b.likes! - a.likes!)
-            .map((blog: iBlog) => (
-              <Blog key={blog.id} blog={blog} user={user} />
-            ))}
-        </section>
-      ) : (
-        <LoginForm />
-      )}
+      <BrowserRouter>
+        <Navigation />
+        <Routes>
+          <Route
+            index
+            element={
+              user ? <BlogList blogList={blogQuery?.data} /> : <LoginForm />
+            }
+          />
+          <Route
+            path="/users"
+            element={<UserList/>}
+          />
+          <Route
+            path="/users/:id"
+            element={<User/>}
+          />
+        </Routes>
+      </BrowserRouter>
     </main>
   );
 }

@@ -5,7 +5,7 @@ import {
   useContext,
   useReducer,
 } from 'react';
-import { iUser } from './services/login';
+import { iUser } from './services/users';
 
 export type userAction = {
   type: string;
