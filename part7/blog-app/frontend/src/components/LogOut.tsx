@@ -1,14 +1,10 @@
-import { iUser } from "../services/login";
+import { useUserDispatch } from '../UserContext';
 
-interface LogOutProps {
-    setUser(user: iUser | null): void;
-}
-
-
-const LogOut = ({setUser}: LogOutProps) => {
+const LogOut = () => {
+  const dispatch = useUserDispatch();
   const handleLogOut = () => {
     window.localStorage.removeItem('loggedBlogappUser');
-    setUser(null)
+    dispatch({ type: 'REMOVE_USER', payload: null });
   };
   return (
     <div>

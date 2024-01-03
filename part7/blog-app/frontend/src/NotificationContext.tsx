@@ -1,6 +1,7 @@
 import {
   Dispatch,
   ReactElement,
+  Reducer,
   createContext,
   useContext,
   useReducer,
@@ -13,7 +14,7 @@ interface notificationState {
 
 export type notificationAction = {
   type: string;
-  payload?: string;
+  payload: string;
 };
 
 interface NotificationContextValue {
@@ -25,10 +26,10 @@ const NotificationContext = createContext<NotificationContextValue | null>(
   null,
 );
 
-const notificationReducer = (
-  state: notificationState | null,
-  action: notificationAction,
-) => {
+const notificationReducer: Reducer<
+  notificationState | null,
+  notificationAction
+> = (state, action) => {
   switch (action.type) {
     case 'SET_SUCCESS':
       return { type: 'success', message: action.payload };
@@ -62,5 +63,7 @@ export const useNotificationValue = () => {
 
 export const useNotificationDispatch = () => {
   const valueAndDispatch = useContext(NotificationContext);
-  return valueAndDispatch?.dispatch;
+  return valueAndDispatch!.dispatch;
 };
+
+export type RESET_NOTIFICATION = {type: 'RESET'}

@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { getAllBlogs, setToken } from './services/blogs';
 import { iBlog } from './services/blogs';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
-import { iUser } from './services/login';
 import LogOut from './components/LogOut';
 import NewBlogForm from './components/NewBlogForm';
 import Togglable from './components/Togglable';
 import Notification from './components/Notification';
 import { useQuery } from '@tanstack/react-query';
+import { useUserDispatch, useUserValue } from './UserContext';
 
 function App() {
-  const [user, setUser] = useState<iUser | null>(null);
+  const dispatch = useUserDispatch();
+  const user = useUserValue();
 
   const blogQuery = useQuery({
     queryKey: ['blogs'],
@@ -26,7 +27,7 @@ function App() {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      dispatch({ type: 'SET_USER', payload: user });
       setToken(user.token);
     }
   }, []);
@@ -51,7 +52,7 @@ function App() {
           <Togglable action="new blog">
             <NewBlogForm />
           </Togglable>
-          <LogOut setUser={setUser} />
+          <LogOut />
           {blogQuery?.data
             .sort((a: iBlog, b: iBlog) => b.likes! - a.likes!)
             .map((blog: iBlog) => (
@@ -59,7 +60,7 @@ function App() {
             ))}
         </section>
       ) : (
-        <LoginForm setUser={setUser} />
+        <LoginForm />
       )}
     </main>
   );

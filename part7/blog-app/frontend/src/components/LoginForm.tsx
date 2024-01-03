@@ -1,19 +1,16 @@
 import { SyntheticEvent, useState } from 'react';
-import { iUser } from '../services/login';
 import { login } from '../services/login';
 import { AxiosError } from 'axios';
 import { setToken } from '../services/blogs';
 import { setMessageAfterDelay } from '../utils/helper';
 import { useNotificationDispatch } from '../NotificationContext';
+import { useUserDispatch } from '../UserContext';
 
-interface LoginFormProps {
-  setUser(user: iUser): void;
-}
-
-const LoginForm = ({ setUser }: LoginFormProps) => {
+const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useNotificationDispatch();
+  const notificationDispatch = useNotificationDispatch();
+  const userDispatch = useUserDispatch();
 
   const handleLogin = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -21,13 +18,16 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
       const user = await login({ username, password });
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user));
       setToken(user.token);
-      setUser(user);
+      userDispatch({ type: 'SET_USER', payload: user });
       setUsername('');
       setPassword('');
     } catch (error) {
-      if (error instanceof AxiosError && dispatch) {
-        dispatch({type: 'SET_ERROR', payload: `${error.response?.status}: incorrect username or password`});
-        setMessageAfterDelay(dispatch,'RESET', 5000);
+      if (error instanceof AxiosError) {
+        notificationDispatch({
+          type: 'SET_ERROR',
+          payload: `${error.response?.status}: incorrect username or password`,
+        });
+        setMessageAfterDelay(notificationDispatch, 'RESET', 5000, '');
       }
     }
   };
@@ -45,7 +45,7 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
             type="text"
             value={username}
             name="username"
-            id='username'
+            id="username"
             onChange={({ target }) => setUsername(target.value)}
           />
         </div>
@@ -56,14 +56,14 @@ const LoginForm = ({ setUser }: LoginFormProps) => {
             type="password"
             value={password}
             name="password"
-            id='password'
+            id="password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
         <button
           className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
           type="submit"
-          id='login'
+          id="login"
         >
           login
         </button>

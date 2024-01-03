@@ -5,7 +5,7 @@ const setMessageAfterDelay = (
   dispatch: Dispatch<notificationAction>,
   type: string,
   delay: number,
-  message?: string,
+  message: string,
 ) => {
   setTimeout(() => {
     dispatch({type, payload: message});

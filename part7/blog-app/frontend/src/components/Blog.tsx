@@ -48,7 +48,7 @@ const Blog = ({ blog, user }: BlogProps) => {
           type: 'SET_ERROR',
           payload: updateLikesMutattion.error.message,
         });
-      setMessageAfterDelay(dispatch!, 'RESET', 5000);
+      setMessageAfterDelay(dispatch!, 'RESET', 5000, '');
     }
   };
 
@@ -62,7 +62,7 @@ const Blog = ({ blog, user }: BlogProps) => {
           type: 'SET_ERROR',
           payload: deleteBlogMutation.error.message,
         });
-      setMessageAfterDelay(dispatch!, 'RESET', 5000);
+      setMessageAfterDelay(dispatch!, 'RESET', 5000, '');
     }
   };
   return (

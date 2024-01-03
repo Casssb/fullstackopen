@@ -27,12 +27,11 @@ const NewBlogForm = () => {
     };
     newBlogMutation.mutate(newBlog);
     const successString = `New blog added: ${newBlog.title} by ${newBlog.author}`;
-    dispatch && dispatch({ type: 'SET_SUCCESS', payload: successString });
-    setMessageAfterDelay(dispatch!, 'RESET', 5000);
+    dispatch({ type: 'SET_SUCCESS', payload: successString });
+    setMessageAfterDelay(dispatch!, 'RESET', 5000, '');
     if (newBlogMutation.isError) {
-      dispatch &&
-        dispatch({ type: 'SET_ERROR', payload: newBlogMutation.error.message });
-      setMessageAfterDelay(dispatch!, 'RESET', 5000);
+      dispatch({ type: 'SET_ERROR', payload: newBlogMutation.error.message });
+      setMessageAfterDelay(dispatch!, 'RESET', 5000, '');
     }
   };
   return (
