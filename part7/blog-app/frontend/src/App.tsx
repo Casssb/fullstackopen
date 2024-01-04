@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useUserDispatch, useUserValue } from './UserContext';
+import Blog from './components/Blog';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
@@ -14,7 +15,7 @@ function App() {
   const dispatch = useUserDispatch();
   const user = useUserValue();
 
-  const {isLoading, isError, data, error} = useQuery({
+  const { isLoading, isError, data, error } = useQuery({
     queryKey: ['blogs'],
     queryFn: getAllBlogs,
     refetchOnWindowFocus: false,
@@ -49,18 +50,11 @@ function App() {
         <Routes>
           <Route
             index
-            element={
-              user ? <BlogList blogList={data} /> : <LoginForm />
-            }
+            element={user ? <BlogList blogList={data} /> : <LoginForm />}
           />
-          <Route
-            path="/users"
-            element={<UserList/>}
-          />
-          <Route
-            path="/users/:id"
-            element={<User/>}
-          />
+          <Route path="/users" element={<UserList />} />
+          <Route path="/users/:id" element={<User />} />
+          <Route path="/blogs/:id" element={<Blog />} />
         </Routes>
       </BrowserRouter>
     </main>

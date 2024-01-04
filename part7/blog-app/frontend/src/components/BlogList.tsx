@@ -1,6 +1,6 @@
 import { useUserValue } from '../UserContext';
 import { iBlog } from '../services/blogs';
-import Blog from './Blog';
+import BlogListElem from './BlogListElem';
 import LogOut from './LogOut';
 import NewBlogForm from './NewBlogForm';
 import Togglable from './Togglable';
@@ -24,7 +24,7 @@ const BlogList = ({ blogList }: BlogListProps) => {
         {blogList
           .sort((a: iBlog, b: iBlog) => b.likes! - a.likes!)
           .map((blog: iBlog) => (
-            <Blog key={blog.id} blog={blog} user={user} />
+            <BlogListElem key={blog.id} blog={blog} />
           ))}
       </section>
     )
