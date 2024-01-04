@@ -43,7 +43,7 @@ function App() {
 
   return (
     <main className="bg-slate-200 h-full min-h-screen flex flex-col gap-1 justify-center items-center">
-      <h1 className="font-mono text-2xl p-2 font-bold">Blogs R Us</h1>
+      <h1 className="font-mono mb-4 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">Blogs R Us</h1>
       <Notification />
       <BrowserRouter>
         <Navigation />
