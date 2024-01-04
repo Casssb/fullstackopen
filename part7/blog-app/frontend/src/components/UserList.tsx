@@ -1,22 +1,33 @@
 import { useQuery } from '@tanstack/react-query';
 import { getAllUsers, iUser } from '../services/users';
+import { useNavigate } from 'react-router-dom';
 
 const UserList = () => {
-  const userQuery = useQuery({
+  const {isLoading, isError, data, error} = useQuery({
     queryKey: ['users'],
-    queryFn: getAllUsers,
+    queryFn: () => getAllUsers(),
     refetchOnWindowFocus: false,
     retry: 1,
   });
+  const navigate = useNavigate();
 
-  console.log(userQuery.data)
+  console.log(data)
+
+  if (isLoading) {
+    return <p>...loading</p>
+  }
+
+  if (isError) {
+    return <p>Error: {error.message}</p>
+  }
 
   return (
     <div>
-      {userQuery.data && userQuery.data.map((user: iUser) => (
-        <p key={user.id}>
-          {user.name} blogs created:{user.blogs.length}
-        </p>
+      {data.map((user: iUser) => (
+        <div key={user.id} className='flex gap-4'>
+          <button onClick={() => navigate(`/users/${user.id}`)}>{user.name}</button>
+          <p>{user.blogs.length}</p>
+        </div>
       ))}
     </div>
   );

@@ -1,20 +1,20 @@
-import { useEffect } from 'react';
-import { getAllBlogs, setToken } from './services/blogs';
-import LoginForm from './components/LoginForm';
-import Notification from './components/Notification';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useUserDispatch, useUserValue } from './UserContext';
 import BlogList from './components/BlogList';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
-import UserList from './components/UserList';
+import Notification from './components/Notification';
 import User from './components/User';
+import UserList from './components/UserList';
+import { getAllBlogs, setToken } from './services/blogs';
 
 function App() {
   const dispatch = useUserDispatch();
   const user = useUserValue();
 
-  const blogQuery = useQuery({
+  const {isLoading, isError, data, error} = useQuery({
     queryKey: ['blogs'],
     queryFn: getAllBlogs,
     refetchOnWindowFocus: false,
@@ -32,12 +32,12 @@ function App() {
     }
   }, []);
 
-  if (blogQuery.isLoading) {
+  if (isLoading) {
     return <div>loading data...</div>;
   }
 
-  if (blogQuery.isError) {
-    return <div>blog off</div>;
+  if (isError) {
+    return <div>blog off: {error.message}</div>;
   }
 
   return (
@@ -50,7 +50,7 @@ function App() {
           <Route
             index
             element={
-              user ? <BlogList blogList={blogQuery?.data} /> : <LoginForm />
+              user ? <BlogList blogList={data} /> : <LoginForm />
             }
           />
           <Route

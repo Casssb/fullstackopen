@@ -15,4 +15,9 @@ const getAllUsers = async () => {
   return response.data;
 };
 
-export { getAllUsers };
+const getSingleUser = async (id: string) => {
+  const response = await axios.get(`${baseUrl}/${id}`);
+  return response.data;
+};
+
+export { getAllUsers, getSingleUser };
