@@ -11,12 +11,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import AuthorSelect from '@/components/AuthorSelect';
+import { useAuth } from '@/auth';
 
 export const Route = createFileRoute('/Authors')({
   component: Authors,
 });
 
-type Author = {
+export type Author = {
   name: string;
   id: string;
   born: number;
@@ -25,6 +26,7 @@ type Author = {
 
 function Authors() {
   const result = useQuery(ALL_AUTHORS);
+  const { isAuthenticated } = useAuth();
 
   if (result.loading) {
     return <div>loading...</div>;
@@ -50,9 +52,11 @@ function Authors() {
           ))}
         </TableBody>
       </Table>
-      <AuthorSelect
-        authors={result.data.allAuthors.map((author: Author) => author.name)}
-      />
+      {isAuthenticated && (
+        <AuthorSelect
+          authors={result.data.allAuthors.map((author: Author) => author.name)}
+        />
+      )}
     </div>
   );
 }

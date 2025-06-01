@@ -11,11 +11,18 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as RecommendedImport } from './routes/Recommended'
 import { Route as BooksImport } from './routes/Books'
 import { Route as AuthorsImport } from './routes/Authors'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const RecommendedRoute = RecommendedImport.update({
+  id: '/Recommended',
+  path: '/Recommended',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const BooksRoute = BooksImport.update({
   id: '/Books',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BooksImport
       parentRoute: typeof rootRoute
     }
+    '/Recommended': {
+      id: '/Recommended'
+      path: '/Recommended'
+      fullPath: '/Recommended'
+      preLoaderRoute: typeof RecommendedImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -69,12 +83,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Authors': typeof AuthorsRoute
   '/Books': typeof BooksRoute
+  '/Recommended': typeof RecommendedRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/Authors': typeof AuthorsRoute
   '/Books': typeof BooksRoute
+  '/Recommended': typeof RecommendedRoute
 }
 
 export interface FileRoutesById {
@@ -82,14 +98,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/Authors': typeof AuthorsRoute
   '/Books': typeof BooksRoute
+  '/Recommended': typeof RecommendedRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/Authors' | '/Books'
+  fullPaths: '/' | '/Authors' | '/Books' | '/Recommended'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/Authors' | '/Books'
-  id: '__root__' | '/' | '/Authors' | '/Books'
+  to: '/' | '/Authors' | '/Books' | '/Recommended'
+  id: '__root__' | '/' | '/Authors' | '/Books' | '/Recommended'
   fileRoutesById: FileRoutesById
 }
 
@@ -97,12 +114,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthorsRoute: typeof AuthorsRoute
   BooksRoute: typeof BooksRoute
+  RecommendedRoute: typeof RecommendedRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthorsRoute: AuthorsRoute,
   BooksRoute: BooksRoute,
+  RecommendedRoute: RecommendedRoute,
 }
 
 export const routeTree = rootRoute
@@ -117,7 +136,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/Authors",
-        "/Books"
+        "/Books",
+        "/Recommended"
       ]
     },
     "/": {
@@ -128,6 +148,9 @@ export const routeTree = rootRoute
     },
     "/Books": {
       "filePath": "Books.tsx"
+    },
+    "/Recommended": {
+      "filePath": "Recommended.tsx"
     }
   }
 }

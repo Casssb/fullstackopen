@@ -34,6 +34,7 @@ const addBookSchema = z.object({
     .string()
     .min(2, { message: 'Book title must be at least 2 characters.' }),
   published: z.coerce.number(),
+  genres: z.string().optional(),
 });
 
 const BookDialog = () => {
@@ -44,6 +45,7 @@ const BookDialog = () => {
       author: '',
       title: '',
       published: 1970,
+      genres: undefined,
     },
   });
 
@@ -52,9 +54,13 @@ const BookDialog = () => {
   });
 
   const onSubmit = (values: z.infer<typeof addBookSchema>) => {
-    const { author, title, published } = values;
+    const { author, title, published, genres } = values;
 
-    createBook({ variables: { title, published, author } });
+    const formattedGeneres = genres?.split(',').map((genre) => genre.trim());
+
+    createBook({
+      variables: { title, published, author, genres: formattedGeneres ?? [] },
+    });
     setOpen(false);
   };
 
@@ -113,6 +119,22 @@ const BookDialog = () => {
                     <Input placeholder="Some title" {...field} />
                   </FormControl>
                   <FormDescription>Enter the title of the book</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="genres"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Genres</FormLabel>
+                  <FormControl>
+                    <Input placeholder="enter genre" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Enter genres separated by ','
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
