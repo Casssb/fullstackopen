@@ -21,7 +21,10 @@ const processBMIArguments = (args: string[]) => {
   }
 };
 
-const calculateBMI = (heightCM: number, weightKG: number): BMICategory => {
+export const calculateBMI = (
+  heightCM: number,
+  weightKG: number
+): BMICategory => {
   const heightMeters = heightCM / 100;
   const bmiCalculation = weightKG / heightMeters ** 2;
 
@@ -38,13 +41,15 @@ const calculateBMI = (heightCM: number, weightKG: number): BMICategory => {
   }
 };
 
-try {
-  const { heightCM, weightKG } = processBMIArguments(process.argv);
-  console.log(calculateBMI(heightCM, weightKG));
-} catch (error: unknown) {
-  if (error instanceof Error) {
-    console.log(error.message);
-  } else {
-    console.log('An unkown error occured');
+if (import.meta.filename === process.argv[1]) {
+  try {
+    const { heightCM, weightKG } = processBMIArguments(process.argv);
+    console.log(calculateBMI(heightCM, weightKG));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else {
+      console.log('An unkown error occured');
+    }
   }
 }

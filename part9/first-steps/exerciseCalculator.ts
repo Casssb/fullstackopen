@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ratings = {
   1: 'not good',
   2: 'ok',
@@ -63,7 +64,7 @@ const calculateRating = (
   }
 };
 
-const calculateExercises = (
+export const calculateExercises = (
   dailyExerciseHours: number[],
   targetHours: number
 ): ExerciseReport => {
@@ -87,15 +88,17 @@ const calculateExercises = (
   };
 };
 
-try {
-  const { targetHours, dailyExerciseHours } =
-    processExcersieCalculatorArguments(process.argv);
-  console.log(calculateExercises(dailyExerciseHours, targetHours));
-} catch (error: unknown) {
-  if (error instanceof Error) {
-    console.log(error.message);
-  } else {
-    console.log('An unkown error occured');
+if (import.meta.filename === process.argv[1]) {
+  try {
+    const { targetHours, dailyExerciseHours } =
+      processExcersieCalculatorArguments(process.argv);
+    console.log(calculateExercises(dailyExerciseHours, targetHours));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else {
+      console.log('An unkown error occured');
+    }
   }
 }
 // console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));

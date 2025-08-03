@@ -1,0 +1,34 @@
+### test
+GET http://localhost:3003/hello
+
+### bmi correct params
+GET http://localhost:3003/bmi?height=180&weight=72
+
+### bmi params wrong type
+GET http://localhost:3003/bmi?height=ballbag&weight=null
+
+### excercises correct params
+POST http://localhost:3003/exercises
+content-type: application/json
+
+{
+  "daily_exercises": [1, 0, 2, 0, 3, 0, 2.5],
+  "target": 2.5
+}
+
+### excercises missing param
+POST http://localhost:3003/exercises
+content-type: application/json
+
+{
+  "target": 2.5
+}
+
+### excercises wrong params
+POST http://localhost:3003/exercises
+content-type: application/json
+
+{
+  "daily_exercises": [1, "balls", 2, 0, 3, 0, 2.5],
+  "target": 2.5
+}
