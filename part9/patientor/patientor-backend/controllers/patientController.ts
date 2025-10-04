@@ -1,7 +1,7 @@
 import express from 'express';
 import patientService from '../services/patientService';
-import { NewPatientSchema } from '../utils';
 import z from 'zod';
+import { EntrySchema, NewPatientSchema } from '../schema';
 
 const patientController = express.Router();
 
@@ -19,6 +19,24 @@ patientController.post('/', (req, res) => {
       res.status(400).send({ error: error.issues });
     } else {
       res.status(400).send({ error: 'unkown error' });
+    }
+  }
+});
+
+patientController.get('/:id', (req, res) => {
+  res.send(patientService.getPatientById(req.params.id) ?? []);
+});
+
+patientController.post('/:id/entries', (req, res) => {
+  try {
+    const newEntry = EntrySchema.parse(req.body);
+    const addedEntry = patientService.addEntry(newEntry, req.params.id);
+    res.json(addedEntry);
+  } catch (error: unknown) {
+    if (error instanceof z.ZodError) {
+      res.status(400).send({ error: error.issues });
+    } else {
+      res.status(400).send({ error: error ? error : 'unkown error' });
     }
   }
 });
